@@ -17,13 +17,18 @@ class AnimationWidget extends StatefulWidget {
     this.anchor = Anchor.topLeft,
   }) : assert(animation.loaded(), 'Animation must be loaded');
 
+  AnimationController controller;
+  AnimationController getController() {
+    return controller;
+  }
+
   @override
   State createState() => _AnimationWidget();
 }
 
 class _AnimationWidget extends State<AnimationWidget>
     with SingleTickerProviderStateMixin {
-  AnimationController _controller;
+  AnimationController controller;
   double _lastUpdated;
 
   @override
@@ -40,7 +45,7 @@ class _AnimationWidget extends State<AnimationWidget>
   void initState() {
     super.initState();
 
-    _controller = AnimationController(vsync: this)
+    controller = AnimationController(vsync: this)
       ..addListener(() {
         final now = DateTime.now().millisecond.toDouble();
 
@@ -57,25 +62,26 @@ class _AnimationWidget extends State<AnimationWidget>
     if (widget.playing) {
       _initAnimation();
     }
+    widget.controller = controller;
   }
 
   void _initAnimation() {
     setState(() {
       widget.animation.reset();
       _lastUpdated = DateTime.now().millisecond.toDouble();
-      _controller.repeat(
+      controller.repeat(
           // Approximately 60 fps
           period: const Duration(milliseconds: 16));
     });
   }
 
   void _pauseAnimation() {
-    setState(() => _controller.stop());
+    setState(() => controller.stop());
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    controller.dispose();
     super.dispose();
   }
 
